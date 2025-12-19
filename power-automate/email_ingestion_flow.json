@@ -1,0 +1,149 @@
+{
+  "name": "Email Ingestion Flow",
+  "description": "Trigger: New email in Outlook → Extract metadata → Classify with Azure OpenAI → Enrich with APIs → Store in Fabric",
+  "trigger": "When a new email arrives (Outlook)",
+  "actions": [
+    {
+      "type": "variable",
+      "name": "Initialize email metadata",
+      "description": "Extract from, subject, body, attachments"
+    },
+    {
+      "type": "action",
+      "name": "Call Azure OpenAI - Classify Intent",
+      "description": "POST to Azure OpenAI with prompt to classify email into: order_tracking, returns, product_info, delivery, payment, complaint",
+      "input": {
+        "model": "gpt-4o-mini",
+        "prompt": "You are a retail customer service classifier. Classify this email into one of: order_tracking, returns, product_info, delivery, payment, complaint. Extract customer_id (email), order_id if present, and sentiment (positive/neutral/negative). Return JSON.",
+        "max_tokens": 200,
+        "temperature": 0.3
+      },
+      "output": {
+        "intent": "string",
+        "confidence": "decimal",
+        "customer_id": "string",
+        "order_id": "string",
+        "sentiment": "string",
+        "priority": "string"
+      }
+    },
+    {
+      "type": "condition",
+      "name": "Check if order-related",
+      "description": "If intent involves order, enrich with Shopify API",
+      "true_path": [
+        {
+          "type": "action",
+          "name": "Query Shopify API - Get Order",
+          "description": "GET /orders/{order_id}.json",
+          "output": {
+            "order_id": "string",
+            "status": "string",
+            "fulfillment_status": "string",
+            "total_price": "decimal",
+            "created_at": "timestamp"
+          }
+        },
+        {
+          "type": "action",
+          "name": "Query FedEx/UPS API - Get Tracking",
+          "description": "GET /tracking/{tracking_number}",
+          "output": {
+            "current_location": "string",
+            "status": "string",
+            "estimated_delivery": "timestamp"
+          }
+        }
+      ]
+    },
+    {
+      "type": "condition",
+      "name": "Check if payment-related",
+      "description": "If intent involves payment, query Stripe",
+      "true_path": [
+        {
+          "type": "action",
+          "name": "Query Stripe API - Get Charge",
+          "description": "GET /charges/{charge_id}",
+          "output": {
+            "charge_id": "string",
+            "amount": "decimal",
+            "status": "string",
+            "refunded": "boolean"
+          }
+        }
+      ]
+    },
+    {
+      "type": "action",
+      "name": "Call Azure OpenAI - Generate Response",
+      "description": "POST to Azure OpenAI with enriched data to generate customer response",
+      "input": {
+        "model": "gpt-4o-mini",
+        "prompt": "Based on customer inquiry and the following data, generate a helpful, accurate response:\nCustomer: {customer_data}\nOrder: {order_data}\nTracking: {tracking_data}\nPayment: {payment_data}\n\nResponse should be professional, concise, and empathetic.",
+        "max_tokens": 500,
+        "temperature": 0.7
+      },
+      "output": {
+        "response_body": "string",
+        "confidence": "decimal"
+      }
+    },
+    {
+      "type": "condition",
+      "name": "Requires human review?",
+      "description": "If confidence < 0.7 or sentiment = negative, flag for human review",
+      "true_path": [
+        {
+          "type": "action",
+          "name": "Send approval email to agent",
+          "description": "Notify agent to review & customize response before sending"
+        }
+      ],
+      "false_path": [
+        {
+          "type": "action",
+          "name": "Send auto-reply",
+          "description": "Reply to customer with generated response"
+        }
+      ]
+    },
+    {
+      "type": "action",
+      "name": "Write to Fabric Lakehouse - Bronze",
+      "description": "POST raw email data to bronze_email_raw table",
+      "target": "Fabric Lakehouse",
+      "table": "bronze_email_raw",
+      "data": {
+        "email_id": "GUID",
+        "from_address": "string",
+        "subject": "string",
+        "body": "string",
+        "received_time": "timestamp",
+        "raw_json": "full payload"
+      }
+    },
+    {
+      "type": "action",
+      "name": "Write to Fabric Lakehouse - Silver",
+      "description": "POST classified & enriched data to silver_email_messages table",
+      "target": "Fabric Lakehouse",
+      "table": "silver_email_messages",
+      "data": {
+        "email_id": "GUID",
+        "customer_id": "string",
+        "intent": "string",
+        "confidence_score": "decimal",
+        "extracted_order_id": "string",
+        "sentiment": "string",
+        "priority": "string",
+        "processed_time": "timestamp"
+      }
+    },
+    {
+      "type": "action",
+      "name": "Log interaction",
+      "description": "POST to FactEmailInteraction in Data Warehouse"
+    }
+  ]
+}
