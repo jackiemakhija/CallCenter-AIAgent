@@ -113,26 +113,50 @@ class CallCenterChatbot:
         self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.conversation_log = []
         
-        # Intent patterns
+        # Intent patterns - expanded with more keywords
         self.intent_patterns = {
-            'order_tracking': ['where', 'track', 'order', 'status', 'delivery', 'when', 'my order'],
-            'returns': ['return', 'refund', 'exchange', 'broken', 'damaged', 'defective'],
-            'product_info': ['product', 'specs', 'features', 'size', 'color', 'price', 'available'],
-            'delivery': ['delivery', 'shipped', 'arrived', 'delay', 'late', 'address'],
-            'payment': ['payment', 'charge', 'refund', 'card', 'billing', 'invoice'],
-            'complaint': ['complaint', 'unhappy', 'poor', 'bad', 'issue', 'problem']
+            'order_tracking': ['where', 'track', 'order', 'status', 'delivery', 'when', 'my order', 'shipped', 
+                             'dispatched', 'transit', 'location', 'package', 'parcel', 'shipment', 'tracking number',
+                             'estimated arrival', 'expected', 'eta', 'order number', 'confirmation'],
+            'returns': ['return', 'refund', 'exchange', 'broken', 'damaged', 'defective', 'wrong item',
+                       'not as described', 'send back', 'rma', 'warranty', 'replacement', 'money back',
+                       'cancel order', 'wrong size', 'wrong color', 'not working', 'faulty'],
+            'product_info': ['product', 'specs', 'features', 'size', 'color', 'price', 'available', 'stock',
+                           'in stock', 'details', 'description', 'specifications', 'dimensions', 'weight',
+                           'material', 'warranty', 'reviews', 'rating', 'brand', 'model', 'compare'],
+            'delivery': ['delivery', 'shipped', 'arrived', 'delay', 'late', 'address', 'shipping cost',
+                        'express', 'standard', 'overnight', 'rush', 'when will it arrive', 'delivery time',
+                        'shipping options', 'free shipping', 'tracking', 'courier', 'carrier'],
+            'payment': ['payment', 'charge', 'refund', 'card', 'billing', 'invoice', 'receipt', 'charged twice',
+                       'wrong amount', 'payment method', 'credit card', 'paypal', 'transaction', 'authorization',
+                       'pending charge', 'installment', 'discount code', 'promo code', 'coupon'],
+            'complaint': ['complaint', 'unhappy', 'poor', 'bad', 'issue', 'problem', 'disappointed', 'angry',
+                         'frustrated', 'terrible', 'horrible', 'worst', 'unacceptable', 'disgusted', 'never again',
+                         'sue', 'legal', 'manager', 'supervisor', 'corporate'],
+            'account': ['account', 'login', 'password', 'username', 'email', 'profile', 'update', 'change',
+                       'forgot password', 'reset', 'verify', 'phone number', 'address book', 'preferences'],
+            'shipping_address': ['shipping address', 'delivery address', 'change address', 'wrong address',
+                                'update address', 'ship to', 'deliver to', 'different address', 'gift address'],
+            'cancellation': ['cancel', 'cancellation', 'stop order', 'dont want', 'changed mind', 'cancel order',
+                           'before shipping', 'before delivery', 'no longer need'],
+            'gift_cards': ['gift card', 'voucher', 'gift certificate', 'balance', 'redeem', 'gift wrap',
+                          'gift message', 'gift receipt', 'gift order']
         }
         
-        # Response templates
+        # Response templates - expanded with more variety
         self.responses = {
-            'order_tracking': "📦 **Order Tracking**\n\nYour order #ORD-12345 is on its way!\n\n• Status: In Transit\n• Carrier: FedEx\n• Tracking: 794617384617\n• Estimated Delivery: Tomorrow by 5 PM\n\n[Track Live](https://fedex.com)",
-            'returns': "🔄 **Return Process**\n\nHere's how to return your item:\n\n1. Visit your account ➜ Orders\n2. Select the item ➜ Request Return\n3. Choose reason & print label\n4. Drop at nearest pickup point\n5. Refund in 5-7 business days",
-            'product_info': "ℹ️ **Product Details**\n\n**Premium Wireless Headphones**\n• Battery: 30 hours\n• Noise Cancellation: Active\n• Price: $299.99\n• Rating: 4.8/5 ⭐\n\nIn stock - Ready to ship!",
-            'delivery': "🚚 **Delivery Information**\n\nYour shipment is on track!\n\n• Current Location: Distribution Center (Chicago)\n• Next Stop: Local Delivery Hub\n• Estimated: 24-48 hours\n\nYou'll receive SMS/Email updates.",
-            'payment': "💳 **Payment & Billing**\n\nI can help with:\n• Payment confirmation\n• Invoice details\n• Refund status\n\nWhat specifically do you need?",
-            'complaint': "😞 **We Apologize**\n\nI'm escalating to our senior team immediately. They will:\n\n✓ Review your issue\n✓ Contact within 1 hour\n✓ Provide solution",
-            'escalate': "🚨 **ESCALATION: Human Agent**\n\n**Agent Assigned:** Sarah (Senior Specialist)\n**Queue Position:** 1st\n**Wait Time:** ~2 minutes\n\nThey will have full context of your issue!",
-            'default': "👋 **Hello! How can I help?**\n\nI can assist with:\n• 📦 Order tracking\n• 🔄 Returns & refunds\n• ℹ️ Product info\n• 🚚 Delivery status\n• 💳 Billing\n\nWhat do you need?"
+            'order_tracking': "📦 **Order Tracking**\n\nYour order #ORD-12345 is on its way!\n\n• Status: In Transit\n• Carrier: FedEx\n• Tracking: 794617384617\n• Estimated Delivery: Tomorrow by 5 PM\n• Current Location: Distribution Hub (Chicago, IL)\n• Last Update: 2 hours ago\n\n[Track Live](https://fedex.com)\n\n*Need help with another order? Just ask!*",
+            'returns': "🔄 **Return Process**\n\nHere's how to return your item:\n\n1. Visit your account ➜ Orders\n2. Select the item ➜ Request Return\n3. Choose reason & print label\n4. Drop at nearest pickup point\n5. Refund in 5-7 business days\n\n**Return Window:** 30 days from delivery\n**Refund Method:** Original payment method\n**Return Shipping:** FREE (prepaid label)\n\nNeed a replacement instead? Let me know!",
+            'product_info': "ℹ️ **Product Details**\n\n**Premium Wireless Headphones** (Model: WH-2024X)\n\n**Specifications:**\n• Battery Life: 30 hours continuous\n• Noise Cancellation: Active (ANC)\n• Bluetooth: 5.3 with multipoint\n• Weight: 250g\n• Colors: Black, Silver, Rose Gold\n• Warranty: 2 years manufacturer\n\n**Pricing:**\n• Regular: $299.99\n• Sale: $249.99 (16% off)\n\n**Customer Rating:** 4.8/5 ⭐ (2,345 reviews)\n\n✅ **In Stock** - Ships within 24 hours\n\nInterested in similar products? Ask me!",
+            'delivery': "🚚 **Delivery Information**\n\nYour shipment is on track!\n\n**Delivery Options Available:**\n\n📍 **Standard Delivery** (FREE)\n• 5-7 business days\n• Signature not required\n\n⚡ **Express Delivery** ($15.99)\n• 2-3 business days\n• Priority handling\n\n🚀 **Next Day** ($29.99)\n• Order by 2 PM for next day\n• Guaranteed delivery\n\n**Current Order Status:**\n• Location: Regional Facility (Chicago)\n• Next Stop: Local Delivery Hub\n• Estimated: 24-48 hours\n\n📱 You'll receive SMS/Email updates at each step!",
+            'payment': "💳 **Payment & Billing**\n\nI can help with:\n\n**Payment Methods Accepted:**\n• Credit/Debit Cards (Visa, MC, Amex)\n• PayPal & Apple Pay\n• Buy Now, Pay Later (Affirm, Klarna)\n• Gift Cards & Store Credit\n\n**Common Payment Issues:**\n• 💵 Payment confirmation\n• 📄 Invoice/receipt download\n• 💰 Refund status checking\n• 🔄 Duplicate charge resolution\n• 🎟️ Promo code application\n\n**Your Recent Transaction:**\n• Amount: $249.99\n• Date: Dec 19, 2025\n• Status: ✅ Processed\n• Method: Visa ending in 4242\n\nWhat specifically do you need help with?",
+            'complaint': "😞 **We Sincerely Apologize**\n\nI'm very sorry you're experiencing this issue. Your satisfaction is our top priority.\n\n**Immediate Actions:**\n✓ Escalating to Senior Support Team\n✓ Priority case #CS-89234 created\n✓ Manager notification sent\n\n**What Happens Next:**\n• Senior Agent Review: Within 1 hour\n• Direct Call Back: If preferred\n• Resolution Plan: Same day\n• Follow-up: Until resolved\n\n**Compensation Options:**\n• Full refund\n• Replacement with expedited shipping\n• Store credit bonus\n\nA senior specialist will contact you shortly. Is there anything else I can help with right now?",
+            'escalate': "🚨 **ESCALATION: Human Agent**\n\n**Priority Support Assigned**\n\n**Agent:** Sarah Martinez (Senior Specialist)\n**Experience:** 8 years, Customer Satisfaction: 98%\n**Queue Position:** 1st in line\n**Wait Time:** ~2 minutes\n**Case #:** SUP-78234\n\n**Context Shared:**\n✓ Full conversation history\n✓ Account details\n✓ Order information\n✓ Previous interactions\n\nSarah will have everything needed to help you immediately. Thank you for your patience!",
+            'account': "👤 **Account Management**\n\n**Your Account Options:**\n\n🔐 **Security:**\n• Change password\n• Update email\n• Two-factor authentication\n• View login history\n\n📋 **Profile:**\n• Personal information\n• Shipping addresses (3 saved)\n• Payment methods (2 cards)\n• Communication preferences\n\n📦 **Orders:**\n• Order history (23 orders)\n• Track active orders (2)\n• Saved items (15)\n• Wish list (8 items)\n\n**Recent Activity:**\n• Last login: Today, 10:30 AM\n• Last order: Dec 19, 2025\n• Account since: Jan 2023\n• Loyalty points: 1,250 points ($12.50 credit)\n\nWhat would you like to update?",
+            'shipping_address': "📍 **Shipping Address Management**\n\n**Saved Addresses:**\n\n🏠 **Home** (Default)\n123 Main Street\nApt 4B\nNew York, NY 10001\n\n🏢 **Work**\n456 Business Ave\nSuite 200\nNew York, NY 10002\n\n🎁 **Mom's House**\n789 Oak Drive\nBoston, MA 02101\n\n**For Current Order #ORD-12345:**\nShipping to: Home (Default)\n\n**Need to change?**\n• Update before shipment (order not yet shipped)\n• Add new address\n• Set different default\n• Edit existing address\n\nLet me know how I can help!",
+            'cancellation': "🚫 **Order Cancellation**\n\n**Order #ORD-12345 Status:** Processing\n\n✅ **Good News:** This order can still be cancelled!\n\n**Cancellation Details:**\n• Items: Premium Wireless Headphones\n• Amount: $249.99\n• Refund: Full refund to original payment\n• Processing: 3-5 business days\n\n**To Cancel:**\n1. Go to My Orders\n2. Select order #ORD-12345\n3. Click 'Cancel Order'\n4. Choose reason (helps us improve)\n5. Confirm cancellation\n\n**Refund Timeline:**\n• Cancellation: Immediate\n• Refund Issued: Within 24 hours\n• Bank Processing: 3-5 business days\n\nWould you like me to cancel this now, or would you prefer to modify the order instead?",
+            'gift_cards': "🎁 **Gift Cards & Gift Orders**\n\n**Gift Card Balance:**\n• Card #: ****-****-****-3847\n• Current Balance: $150.00\n• Expires: Never!\n\n**Purchase Gift Cards:**\n• Digital: $10 - $500 (instant delivery)\n• Physical: $25 - $500 (shipped FREE)\n• Custom message included\n\n**Gift Order Options:**\n✓ Gift wrapping (+$5.99)\n✓ Personal gift message (FREE)\n✓ Hide prices on packing slip\n✓ Ship directly to recipient\n✓ Gift receipt included\n\n**Current Gift Order:**\n• Recipient: Mom\n• Address: 789 Oak Drive, Boston, MA\n• Gift wrap: Selected (Premium)\n• Message: \"Happy Birthday Mom! Love, Alex\"\n\nNeed to add/redeem a gift card?",
+            'default': "👋 **Hello! I'm Your AI Support Assistant**\n\nI'm here to help with:\n\n📦 **Orders & Tracking**\n• Track your order\n• Order status updates\n• Delivery information\n\n🔄 **Returns & Exchanges**\n• Start a return\n• Check refund status\n• Exchange process\n\n🛍️ **Products**\n• Product details\n• Availability & pricing\n• Recommendations\n\n💳 **Payments & Billing**\n• Payment issues\n• Invoices & receipts\n• Promo codes\n\n👤 **Account Help**\n• Update profile\n• Change password\n• Manage addresses\n\n🎁 **Gift Services**\n• Gift cards\n• Gift wrapping\n• Gift messages\n\n**Quick Actions:**\nClick a quick query button on the right, or just type your question!\n\n*Average response time: Instant ⚡*"
         }
     
     def classify_intent(self, message):
@@ -150,8 +174,13 @@ class CallCenterChatbot:
     
     def detect_sentiment(self, message):
         """Detect sentiment from message"""
-        negative_words = ['angry', 'upset', 'frustrated', 'terrible', 'horrible', 'bad', 'broken']
-        positive_words = ['great', 'thanks', 'appreciate', 'happy', 'excellent']
+        negative_words = ['angry', 'upset', 'frustrated', 'terrible', 'horrible', 'bad', 'broken',
+                         'worst', 'awful', 'disgusting', 'unacceptable', 'disappointed', 'sad',
+                         'pathetic', 'ridiculous', 'useless', 'waste', 'never again', 'hate',
+                         'furious', 'annoyed', 'irritated', 'poor', 'inferior']
+        positive_words = ['great', 'thanks', 'appreciate', 'happy', 'excellent', 'amazing',
+                         'awesome', 'wonderful', 'fantastic', 'love', 'perfect', 'satisfied',
+                         'pleased', 'delighted', 'impressed', 'outstanding', 'superb', 'brilliant']
         
         message_lower = message.lower()
         neg_score = sum(1 for word in negative_words if word in message_lower)
@@ -296,10 +325,15 @@ with st.sidebar:
     quick_queries = [
         "Where is my order?",
         "I want to return my item",
-        "Product specs?",
+        "What are the product specs?",
+        "Show me delivery options",
         "I have a payment issue",
-        "I'm very unhappy!",
-        "Speak to a human"
+        "Change my shipping address",
+        "Cancel my order",
+        "Check gift card balance",
+        "Update my account",
+        "This product is terrible!",
+        "Speak to a human agent"
     ]
     
     for query in quick_queries:
