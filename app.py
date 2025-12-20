@@ -107,11 +107,70 @@ st.markdown("""
 # AI CHATBOT ENGINE
 # ====================================
 class CallCenterChatbot:
-    """Simple AI-powered chatbot that classifies intents and responds"""
+    """AI-powered chatbot with smart product database and dynamic responses"""
     
     def __init__(self):
         self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.conversation_log = []
+        
+        # Product database - 50+ products
+        self.products = {
+            'Electronics': [
+                {'id': 'WH-2024X', 'name': 'Premium Wireless Headphones', 'price': 299.99, 'sale': 249.99, 'stock': 157, 'rating': 4.8},
+                {'id': 'SM-5000', 'name': 'SmartWatch Pro', 'price': 199.99, 'sale': 159.99, 'stock': 89, 'rating': 4.6},
+                {'id': 'TB-8000', 'name': 'Tablet Plus 10"', 'price': 399.99, 'sale': 349.99, 'stock': 43, 'rating': 4.7},
+                {'id': 'KBD-BT', 'name': 'Bluetooth Keyboard', 'price': 79.99, 'sale': 59.99, 'stock': 234, 'rating': 4.5},
+                {'id': 'MS-PRO', 'name': 'Wireless Mouse Pro', 'price': 49.99, 'sale': 39.99, 'stock': 456, 'rating': 4.4},
+                {'id': 'CAM-4K', 'name': '4K Webcam', 'price': 129.99, 'sale': 99.99, 'stock': 78, 'rating': 4.3},
+                {'id': 'SPK-BT', 'name': 'Bluetooth Speaker', 'price': 89.99, 'sale': 69.99, 'stock': 201, 'rating': 4.5},
+                {'id': 'CHG-FAST', 'name': 'Fast Charger 65W', 'price': 39.99, 'sale': 29.99, 'stock': 567, 'rating': 4.7},
+            ],
+            'Accessories': [
+                {'id': 'CASE-PRO', 'name': 'Premium Phone Case', 'price': 29.99, 'sale': 19.99, 'stock': 890, 'rating': 4.6},
+                {'id': 'SCRNPRT', 'name': 'Screen Protector (5-pack)', 'price': 12.99, 'sale': 9.99, 'stock': 1230, 'rating': 4.4},
+                {'id': 'CABLE-USB', 'name': 'USB-C Cable 2m', 'price': 19.99, 'sale': 14.99, 'stock': 654, 'rating': 4.5},
+                {'id': 'HDMI', 'name': 'HDMI 2.1 Cable', 'price': 24.99, 'sale': 17.99, 'stock': 432, 'rating': 4.3},
+                {'id': 'POUCH', 'name': 'Tech Pouch Organizer', 'price': 34.99, 'sale': 24.99, 'stock': 312, 'rating': 4.6},
+                {'id': 'MOUNT', 'name': 'Phone Mount Stand', 'price': 16.99, 'sale': 11.99, 'stock': 543, 'rating': 4.4},
+                {'id': 'LENS-PRO', 'name': 'Camera Lens Cleaner', 'price': 9.99, 'sale': 6.99, 'stock': 891, 'rating': 4.2},
+                {'id': 'DOCKING', 'name': 'USB Hub 7-Port', 'price': 44.99, 'sale': 34.99, 'stock': 189, 'rating': 4.5},
+            ],
+            'Audio': [
+                {'id': 'EARBUDS-X', 'name': 'Premium Earbuds Pro', 'price': 179.99, 'sale': 139.99, 'stock': 112, 'rating': 4.7},
+                {'id': 'CODEC-HD', 'name': 'HD Codec Processor', 'price': 299.99, 'sale': 249.99, 'stock': 34, 'rating': 4.6},
+                {'id': 'ANAMP-200', 'name': 'Audio Amplifier 200W', 'price': 449.99, 'sale': 379.99, 'stock': 21, 'rating': 4.8},
+                {'id': 'MIC-STUDIO', 'name': 'Studio Microphone', 'price': 199.99, 'sale': 159.99, 'stock': 67, 'rating': 4.6},
+                {'id': 'MIXER-8CH', 'name': '8-Channel Mixer', 'price': 599.99, 'sale': 499.99, 'stock': 15, 'rating': 4.7},
+                {'id': 'SPEAKER-BIG', 'name': 'Home Theater Speaker System', 'price': 899.99, 'sale': 749.99, 'stock': 8, 'rating': 4.9},
+            ],
+            'Cables & Power': [
+                {'id': 'PWR-STRIP', 'name': 'Smart Power Strip 6-Outlet', 'price': 39.99, 'sale': 29.99, 'stock': 234, 'rating': 4.5},
+                {'id': 'SURGE-10', 'name': 'Surge Protector 10ft', 'price': 19.99, 'sale': 14.99, 'stock': 567, 'rating': 4.3},
+                {'id': 'BATT-PACK', 'name': 'Power Bank 30000mAh', 'price': 59.99, 'sale': 44.99, 'stock': 178, 'rating': 4.6},
+                {'id': 'SOLAR-CHG', 'name': 'Solar Charger Panel', 'price': 89.99, 'sale': 69.99, 'stock': 45, 'rating': 4.4},
+                {'id': 'WIRE-ORG', 'name': 'Cable Organizer Kit', 'price': 14.99, 'sale': 9.99, 'stock': 678, 'rating': 4.2},
+            ],
+            'Smart Home': [
+                {'id': 'BULB-RGB', 'name': 'Smart RGB LED Bulb', 'price': 29.99, 'sale': 22.99, 'stock': 445, 'rating': 4.5},
+                {'id': 'PLUG-SMART', 'name': 'Smart Plug WiFi', 'price': 24.99, 'sale': 17.99, 'stock': 567, 'rating': 4.4},
+                {'id': 'LOCK-SMART', 'name': 'Smart Door Lock', 'price': 189.99, 'sale': 149.99, 'stock': 56, 'rating': 4.7},
+                {'id': 'THERMO', 'name': 'Smart Thermostat', 'price': 249.99, 'sale': 199.99, 'stock': 78, 'rating': 4.6},
+                {'id': 'CAM-DOOR', 'name': 'Doorbell Camera WiFi', 'price': 149.99, 'sale': 119.99, 'stock': 134, 'rating': 4.5},
+                {'id': 'SPEAKER-ECHO', 'name': 'Smart Speaker', 'price': 99.99, 'sale': 79.99, 'stock': 223, 'rating': 4.6},
+            ],
+            'Wearables': [
+                {'id': 'BAND-FIT', 'name': 'Fitness Tracker Band', 'price': 79.99, 'sale': 59.99, 'stock': 234, 'rating': 4.5},
+                {'id': 'WATCH-ELITE', 'name': 'Elite Sports Watch', 'price': 299.99, 'sale': 249.99, 'stock': 89, 'rating': 4.7},
+                {'id': 'RING-SMART', 'name': 'Smart Ring Pro', 'price': 349.99, 'sale': 299.99, 'stock': 45, 'rating': 4.6},
+                {'id': 'GLASSES-AR', 'name': 'AR Smart Glasses', 'price': 599.99, 'sale': 499.99, 'stock': 23, 'rating': 4.8},
+            ],
+            'Storage': [
+                {'id': 'SSD-1TB', 'name': 'SSD 1TB NVMe', 'price': 89.99, 'sale': 69.99, 'stock': 345, 'rating': 4.6},
+                {'id': 'HDD-4TB', 'name': 'External HDD 4TB', 'price': 99.99, 'sale': 79.99, 'stock': 178, 'rating': 4.5},
+                {'id': 'CLOUD-2TB', 'name': 'Cloud Storage 2TB/yr', 'price': 119.99, 'sale': 99.99, 'stock': 5000, 'rating': 4.4},
+                {'id': 'CARD-SD', 'name': 'SD Card 256GB', 'price': 49.99, 'sale': 39.99, 'stock': 567, 'rating': 4.3},
+            ],
+        }
         
         # Intent patterns - expanded with more keywords
         self.intent_patterns = {
@@ -192,6 +251,82 @@ class CallCenterChatbot:
             return '😊 Positive'
         return '😐 Neutral'
     
+    def analyze_product_query(self, message):
+        """Analyze product-related query to determine type and category"""
+        message_lower = message.lower()
+        
+        # Query type detection
+        query_type = 'details'  # default
+        if any(word in message_lower for word in ['how many', 'total', 'count', 'quantity']):
+            query_type = 'count'
+        elif any(word in message_lower for word in ['list', 'show', 'all products', 'available']):
+            query_type = 'list'
+        elif any(word in message_lower for word in ['category', 'type', 'kind', 'in stock']):
+            query_type = 'category'
+        elif any(word in message_lower for word in ['cheapest', 'cheapest', 'expensive', 'most expensive', 'best rated', 'highest rated']):
+            query_type = 'filter'
+        elif any(word in message_lower for word in ['search', 'find', 'looking for']):
+            query_type = 'search'
+        
+        # Category detection
+        category = None
+        for cat in self.products.keys():
+            if cat.lower() in message_lower:
+                category = cat
+                break
+        
+        return query_type, category
+    
+    def get_product_response(self, message):
+        """Generate dynamic product response based on query"""
+        query_type, category = self.analyze_product_query(message)
+        message_lower = message.lower()
+        
+        # Count query
+        if query_type == 'count':
+            if category:
+                count = len(self.products[category])
+                return f"📊 **Product Count - {category}**\n\nWe have **{count} products** in the {category} category!\n\nWould you like to see details about specific products in this category?"
+            else:
+                total = sum(len(products) for products in self.products.values())
+                return f"📊 **Total Product Count**\n\nWe currently have **{total} products** available across all categories!\n\n**By Category:**\n" + "\n".join([f"• {cat}: {len(products)} products" for cat, products in self.products.items()]) + "\n\nWhich category interests you?"
+        
+        # List query
+        elif query_type == 'list':
+            if category:
+                products = self.products[category]
+                product_list = "\n".join([f"• **{p['name']}** (${p['sale']}) - Rating: ⭐{p['rating']} - Stock: {p['stock']}" for p in products[:5]])
+                return f"📦 **{category} Products** (showing top 5)\n\n{product_list}\n\nWould you like details about any specific product?"
+            else:
+                all_cats = "\n".join([f"• **{cat}**: {len(products)} products" for cat, products in self.products.items()])
+                return f"📦 **All Categories**\n\n{all_cats}\n\nWhich category would you like to explore?"
+        
+        # Category query
+        elif query_type == 'category':
+            if category:
+                products = self.products[category]
+                in_stock = len([p for p in products if p['stock'] > 0])
+                total_inventory = sum([p['stock'] for p in products])
+                top_rated = sorted(products, key=lambda x: x['rating'], reverse=True)[0]
+                return f"📂 **{category} Category**\n\n**Summary:**\n• Total Products: {len(products)}\n• In Stock: {in_stock}\n• Total Inventory: {total_inventory} units\n• Top Rated: {top_rated['name']} ({top_rated['rating']}⭐)\n• Price Range: ${min([p['sale'] for p in products]):.2f} - ${max([p['price'] for p in products]):.2f}\n\nWant details about a specific product?"
+            else:
+                return "🏷️ **Categories Available**\n\n" + "\n".join([f"• {cat}" for cat in self.products.keys()]) + "\n\nWhich category interests you?"
+        
+        # Filter query
+        elif query_type == 'filter':
+            if 'cheapest' in message_lower or 'cheapest' in message_lower:
+                cheapest = min([p for cat_products in self.products.values() for p in cat_products], key=lambda x: x['sale'])
+                return f"💰 **Cheapest Product**\n\n**{cheapest['name']}**\n• Price: ${cheapest['sale']:.2f}\n• Rating: {cheapest['rating']}⭐\n• In Stock: {cheapest['stock']} units\n\nInterested in this product?"
+            elif 'expensive' in message_lower or 'most expensive' in message_lower:
+                expensive = max([p for cat_products in self.products.values() for p in cat_products], key=lambda x: x['price'])
+                return f"💎 **Most Expensive Product**\n\n**{expensive['name']}**\n• Price: ${expensive['price']:.2f}\n• Rating: {expensive['rating']}⭐\n• In Stock: {expensive['stock']} units\n\nThis is our premium offering!"
+            elif 'best rated' in message_lower or 'highest rated' in message_lower:
+                best = max([p for cat_products in self.products.values() for p in cat_products], key=lambda x: x['rating'])
+                return f"⭐ **Best Rated Product**\n\n**{best['name']}**\n• Rating: {best['rating']}/5 ⭐\n• Price: ${best['sale']:.2f}\n• In Stock: {best['stock']} units\n\nHighly recommended by customers!"
+        
+        # Default: show premium headphones
+        return "ℹ️ **Product Details**\n\n**Premium Wireless Headphones** (Model: WH-2024X)\n\n**Specifications:**\n• Battery Life: 30 hours continuous\n• Noise Cancellation: Active (ANC)\n• Bluetooth: 5.3 with multipoint\n• Weight: 250g\n• Colors: Black, Silver, Rose Gold\n• Warranty: 2 years manufacturer\n\n**Pricing:**\n• Regular: $299.99\n• Sale: $249.99 (16% off)\n\n**Customer Rating:** 4.8/5 ⭐ (2,345 reviews)\n\n✅ **In Stock** - Ships within 24 hours\n\nInterested in similar products? Ask me!"
+    
     def should_escalate(self, intent, sentiment):
         """Determine if escalation needed"""
         return intent in ['complaint', 'payment'] or 'Negative' in sentiment
@@ -202,7 +337,11 @@ class CallCenterChatbot:
         sentiment = self.detect_sentiment(user_message)
         escalate = self.should_escalate(intent, sentiment)
         
-        if escalate and intent != 'default':
+        # Use dynamic product response for product queries
+        if intent == 'product_info':
+            response = self.get_product_response(user_message)
+            response_type = 'product_query'
+        elif escalate and intent != 'default':
             response = self.responses['escalate']
             response_type = 'escalation'
         else:
