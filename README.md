@@ -11,7 +11,9 @@ pinned: false
 
 # Call Center AI Chatbot (Hugging Face Space)
 
-Live Space: https://huggingface.co/spaces/jackiemakhija/callcenter-aiaagent
+## Live Demo
+- Space: https://huggingface.co/spaces/jackiemakhija/callcenter-aiaagent
+- If repository secrets are not configured, the app runs in Demo Mode with mock responses.
 
 This repository hosts a streamlined, production-ready demo of a call center AI chatbot with:
 - Intent classification (orders, returns, delivery, product, payments)
@@ -234,6 +236,9 @@ py -m pip install --upgrade pip
 py -m pip install -r requirements.txt
 py -m streamlit run app.py
 ```
+
+## Release Notes
+- v1.0.0: Initial chatbot app deployed to Hugging Face Spaces; repository cleaned and legacy content archived. Demo Mode enabled when secrets are absent.
 
 ## Monitoring
 
