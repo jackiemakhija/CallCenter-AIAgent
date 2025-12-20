@@ -20,18 +20,192 @@ This repository hosts a streamlined, production-ready demo of a call center AI c
 - Sentiment detection and automatic escalation to human agents
 - Modern dark UI and session statistics
 
-Quick Start (local):
+## 📋 Step-by-Step Setup Instructions
 
+### Prerequisites
+- Python 3.10 or higher
+- Git installed
+- Code editor (VS Code recommended)
+- (Optional) Hugging Face account for deployment
+
+### Step 1: Clone or Navigate to Repository
 ```bash
+# If cloning from GitHub
+git clone https://github.com/jackiemakhija/CallCenter-AIAgent.git
 cd CallCenter-AIAgent
+
+# Or if already have local copy
+cd C:\MyCode\foundry-ui\CallCenter-AIAgent
+```
+
+### Step 2: Create Virtual Environment (Recommended)
+```bash
+# Create virtual environment
+py -m venv venv
+
+# Activate virtual environment
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
+```
+
+### Step 3: Install Dependencies
+```bash
+# Upgrade pip
 py -m pip install --upgrade pip
+
+# Install required packages
 py -m pip install -r requirements.txt
+```
+
+Expected output:
+```
+Successfully installed streamlit-1.38.0 plotly-5.24.1 pandas-2.2.3 numpy-2.1.3 python-dotenv-1.0.0 pyarrow-22.0.0
+```
+
+### Step 4: (Optional) Configure Environment Variables
+Create a `.env` file in the root directory if you want to connect real services:
+```bash
+# Copy example (if exists) or create new
+notepad .env
+```
+
+Add these variables:
+```
+FOUNDRY_BASE=your_foundry_endpoint
+POWER_BI_WORKSPACE_ID=your_workspace_id
+POWER_BI_DATASET_ID=your_dataset_id
+AZURE_TENANT_ID=your_tenant_id
+```
+
+**Note:** App works in Demo Mode without these variables!
+
+### Step 5: Run the Application
+```bash
+# Start Streamlit server
 py -m streamlit run app.py
 ```
 
-Deploy to Spaces:
-- Ensure `runtime.txt` (python-3.10) and minimal `requirements.txt` are present
-- Upload this folder to a new Space and add optional secrets later
+Expected output:
+```
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://192.168.x.x:8501
+```
+
+### Step 6: Test the Chatbot
+
+1. **Open Browser**: Navigate to `http://localhost:8501`
+
+2. **Check Environment Panel** (right sidebar):
+   - Should show "Demo Mode: Enabled"
+   - Foundry: ✓ demo
+   - Power BI: ✓ demo
+   - Azure: ✓ demo
+
+3. **Test Quick Queries** (click sidebar buttons):
+   - "Where is my order?" → Should show order tracking response
+   - "I want to return my item" → Should show return process
+   - "I'm very unhappy!" → Should escalate to human agent
+
+4. **Test Custom Messages** (type in chat input):
+   ```
+   Can you track my order #12345?
+   ```
+   Expected: Order tracking response with intent classification
+
+   ```
+   This product is broken and I want a refund!
+   ```
+   Expected: Escalation message (red banner) + sentiment detection
+
+5. **Check Session Stats** (sidebar):
+   - Messages counter should increment
+   - Escalations counter updates when escalated
+   - Bot resolutions shows successful AI responses
+
+### Step 7: Expected Output Examples
+
+**Successful Query:**
+- ✅ Bot response with formatted content
+- 📊 Intent badge showing "Order Tracking" or similar
+- 😊 Sentiment indicator (Positive/Neutral/Negative)
+
+**Escalation Scenario:**
+- 🚨 Red banner with "ESCALATION: Human Agent"
+- Agent assignment details
+- Full conversation context preserved
+
+**Demo Mode Banner:**
+- Light blue background with dark text
+- "Demo Mode: Enabled — using mock data"
+- Green checkmarks for each service in demo mode
+
+### Step 8: Deploy to Hugging Face Spaces
+
+#### Option A: Using Deploy Script
+```bash
+# Set Hugging Face token as environment variable
+set HF_TOKEN=your_hugging_face_token
+
+# Run deployment script
+py scripts/deploy_to_hf.py --space your-username/space-name
+```
+
+#### Option B: Manual Upload
+1. Create new Space at https://huggingface.co/new-space
+2. Choose SDK: Streamlit
+3. Clone Space repository:
+   ```bash
+   git clone https://huggingface.co/spaces/your-username/space-name
+   ```
+4. Copy files to Space directory:
+   ```bash
+   copy app.py space-name/
+   copy requirements.txt space-name/
+   copy runtime.txt space-name/
+   ```
+5. Commit and push:
+   ```bash
+   cd space-name
+   git add .
+   git commit -m "Initial chatbot deployment"
+   git push
+   ```
+
+### Step 9: Verify Deployment
+
+1. **Check Build Status**: Visit your Space URL
+2. **Wait for Build**: Usually takes 2-3 minutes
+3. **Test Live App**: Same testing steps as local
+4. **Add Secrets** (Optional): Settings → Repository secrets
+
+### Troubleshooting
+
+**Issue: Module not found**
+```bash
+# Solution: Reinstall dependencies
+py -m pip install -r requirements.txt --force-reinstall
+```
+
+**Issue: Port already in use**
+```bash
+# Solution: Specify different port
+py -m streamlit run app.py --server.port 8502
+```
+
+**Issue: Streamlit not found**
+```bash
+# Solution: Install directly
+py -m pip install streamlit==1.38.0
+```
+
+**Issue: Space build fails**
+- Check runtime.txt contains `python-3.10`
+- Verify requirements.txt has exact versions
+- Review Space build logs for specific errors
 
 ## Repository Layout
 
