@@ -316,7 +316,7 @@ with st.sidebar:
             st.rerun()
     
     st.markdown("---")
-    st.markdown("### 🔧 Environment")
+    st.markdown("<h3 style='color: #1a1a1a;'>🔧 Environment</h3>", unsafe_allow_html=True)
     _env_status = {
         "FOUNDRY": bool(os.getenv("FOUNDRY_BASE")),
         "Power BI": bool(os.getenv("POWER_BI_WORKSPACE_ID")),
@@ -327,15 +327,15 @@ with st.sidebar:
 
     if demo_mode and all_missing:
         st.markdown(
-            "<div class='metric-badge' style='text-align:center;'>Demo Mode: <strong>Enabled</strong> — using mock data. Secrets not required.</div>",
+            "<div style='background: #d1f0ff; border: 2px solid #0066cc; border-radius: 8px; padding: 12px; text-align:center; color: #003d7a; font-weight: 600;'>Demo Mode: <strong>Enabled</strong> — using mock data. Secrets not required.</div>",
             unsafe_allow_html=True,
         )
         for key in _env_status.keys():
             st.markdown(
-                f"<div style='color:#f8fafc; font-weight:600;'>{key}: <span style='color:#8ef0b4; font-weight:700;'>demo</span></div>",
+                f"<div style='color:#1a1a1a; font-weight:600; margin: 8px 0;'>{key}: <span style='color:#006600; font-weight:700; background: #ccffcc; padding: 2px 8px; border-radius: 4px;'>✓ demo</span></div>",
                 unsafe_allow_html=True,
             )
-        st.caption("Add Space secrets later to connect real services (Foundry, Power BI, Azure).")
+        st.markdown("<p style='color: #4a5568; font-size: 0.85rem; margin-top: 10px;'>Add Space secrets later to connect real services (Foundry, Power BI, Azure).</p>", unsafe_allow_html=True)
     else:
         for key, ok in _env_status.items():
             st.write(f"{key}: {'✅' if ok else '⚠️'}")
