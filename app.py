@@ -322,8 +322,20 @@ with st.sidebar:
         "Power BI": bool(os.getenv("POWER_BI_WORKSPACE_ID")),
         "Azure": bool(os.getenv("AZURE_TENANT_ID")),
     }
-    for key, ok in _env_status.items():
-        st.write(f"{key}: {'✅' if ok else '⚠️'}")
+    demo_mode = os.getenv("DEMO_MODE", "true").lower() in ("1", "true", "yes")
+    all_missing = not any(_env_status.values())
+
+    if demo_mode and all_missing:
+        st.markdown(
+            "<div class='metric-badge' style='text-align:center;'>Demo Mode: <strong>Enabled</strong> — using mock data. Secrets not required.</div>",
+            unsafe_allow_html=True,
+        )
+        for key in _env_status.keys():
+            st.write(f"{key}: ✅ demo")
+        st.caption("Add Space secrets later to connect real services (Foundry, Power BI, Azure).")
+    else:
+        for key, ok in _env_status.items():
+            st.write(f"{key}: {'✅' if ok else '⚠️'}")
 
 # ====================================
 # FOOTER
