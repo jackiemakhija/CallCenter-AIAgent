@@ -331,7 +331,10 @@ with st.sidebar:
             unsafe_allow_html=True,
         )
         for key in _env_status.keys():
-            st.write(f"{key}: ✅ demo")
+            st.markdown(
+                f"<div style='color:#f8fafc; font-weight:600;'>{key}: <span style='color:#8ef0b4; font-weight:700;'>demo</span></div>",
+                unsafe_allow_html=True,
+            )
         st.caption("Add Space secrets later to connect real services (Foundry, Power BI, Azure).")
     else:
         for key, ok in _env_status.items():
