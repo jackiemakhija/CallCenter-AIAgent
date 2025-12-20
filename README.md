@@ -1,3 +1,36 @@
+---
+title: Call Center Analytics Dashboard
+emoji: 📊
+colorFrom: indigo
+colorTo: green
+sdk: streamlit
+sdk_version: 1.38.0
+app_file: app.py
+pinned: false
+---
+
+# Call Center AI Chatbot (Hugging Face Space)
+
+Live Space: https://huggingface.co/spaces/jackiemakhija/callcenter-aiaagent
+
+This repository hosts a streamlined, production-ready demo of a call center AI chatbot with:
+- Intent classification (orders, returns, delivery, product, payments)
+- Sentiment detection and automatic escalation to human agents
+- Modern dark UI and session statistics
+
+Quick Start (local):
+
+```bash
+cd CallCenter-AIAgent
+py -m pip install --upgrade pip
+py -m pip install -r requirements.txt
+py -m streamlit run app.py
+```
+
+Deploy to Spaces:
+- Ensure `runtime.txt` (python-3.10) and minimal `requirements.txt` are present
+- Upload this folder to a new Space and add optional secrets later
+
 # Retail Call Center Automation
 
 ## Overview
@@ -113,7 +146,7 @@ AI-powered retail call center automation handling 1200 emails/day and 800 chats/
 ## Project Structure
 
 ```
-retail-call-center/
+repository/
 ├── fabric/
 │   ├── lakehouse/          # Delta table schemas
 │   ├── warehouse/          # DW views and procedures
@@ -122,8 +155,7 @@ retail-call-center/
 ├── power-automate/
 │   ├── email-flows/       # Email processing workflows
 │   └── chatbot-flows/     # Chatbot integration workflows
-├── power-apps/
-│   └── dashboard/         # Agent dashboard components
+├── power-apps/            # Agent/admin portal assets
 ├── azure-openai/
 │   ├── classifiers/       # Email/chat classification
 │   ├── generators/        # Response generation
@@ -169,6 +201,27 @@ retail-call-center/
    - Configure API credentials in Azure Key Vault
    - Set up Power Automate connections
    - Deploy Power Virtual Agents bot
+
+## Hugging Face Spaces Deployment
+
+This repo includes a Streamlit app at `CallCenter-AIAgent/app.py`. To deploy only the dashboard to Hugging Face Spaces:
+
+1. Create a new Space (type: Streamlit).
+2. Push the contents of the `CallCenter-AIAgent/` folder to the Space repository root (must include `app.py`, `requirements.txt`, `runtime.txt`).
+3. In the Space, set required Secrets under Settings ➜ Repository secrets:
+   - `FOUNDRY_BASE`, `FOUNDRY_MODEL_PHI`, `FOUNDRY_MODEL_QWEN`, `FOUNDRY_TIMEOUT`
+   - `POWER_BI_WORKSPACE_ID`, `POWER_BI_DATASET_ID`, `POWER_BI_BASE_URL`
+   - `AZURE_TENANT_ID`
+4. The build uses Python 3.10 as specified in `runtime.txt`. No additional config is required; the Space will auto-run `app.py`.
+
+Local run for quick validation:
+
+```bash
+cd CallCenter-AIAgent
+py -m pip install --upgrade pip
+py -m pip install -r requirements.txt
+py -m streamlit run app.py
+```
 
 ## Monitoring
 
