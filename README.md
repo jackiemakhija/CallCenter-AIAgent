@@ -31,6 +31,18 @@ Deploy to Spaces:
 - Ensure `runtime.txt` (python-3.10) and minimal `requirements.txt` are present
 - Upload this folder to a new Space and add optional secrets later
 
+## Repository Layout
+
+Active demo files:
+- `app.py` — Streamlit chatbot app
+- `requirements.txt` — minimal deps for Spaces
+- `runtime.txt` — Python 3.10 runtime pin
+- `scripts/deploy_to_hf.py` — helper to upload to Spaces (optional)
+- `.gitignore`, `README.md`
+
+Archived solution artifacts:
+- See `/archive/README.md` for details (architecture, Fabric, APIs, Power Platform, Azure OpenAI, docs)
+
 # Retail Call Center Automation
 
 ## Overview
